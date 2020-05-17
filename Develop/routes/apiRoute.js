@@ -1,5 +1,4 @@
 // Linking the noteContents in db to this routes.
-const noteContents = require("../db/noteContents")
 
 //Create promise-based versions of functions using node style callbacks
 const fs = require("fs");
