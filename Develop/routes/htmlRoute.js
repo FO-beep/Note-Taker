@@ -1,16 +1,18 @@
-// Path package to get the file path for the html
+//The path package needs to be included to get the correct file path for our html.
+
 const path = require("path");
 
-// Create a route
-// Basic routes that sends the user first to the AJAX page
-// Go get the html so that the user can see the page.
+//Routing
 
 module.exports = function (app) {
 
+    //HTML GET requests
+    //The code below handles when users visit a page. In each case below, the user is shown an HTML page of content
     app.get("/notes", function (req, res) {
         res.sendFile(path.join(__dirname, "../public/notes.html"));
     });
 
+    //If no matching route is found, default to index.
     app.get("*", function (req, res) {
         res.sendFile(path.join(__dirname, "../public/index.html"));
     });

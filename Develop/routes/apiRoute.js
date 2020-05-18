@@ -1,66 +1,71 @@
-// Linking the noteContents in db to this routes.
-
-//Create promise-based versions of functions using node style callbacks
+//Load Data - here we link the routes to a series of "data" sources.
+//These data sources hold arrays of information
 const fs = require("fs");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
 
-// Create a route
+const noteData = require("../db/noteData")
+
+//Routing
 module.exports = function (app) {
 
-    //Display all notes
+    //API GET requests
     app.get("/api/notes", function (req, res) {
-        res.json(noteContents);
+        res.json(noteData);
     });
 
-    //Create new posts
+
+    //API POST requests
     app.post("/api/notes", function (req, res) {
-        // noteContents.push(req.body);
-        // res.json(noteContents);
 
-        let newNote = req.body;
+        let newNotes = req.body;
 
-        // check to find last id in our notes json file, and assign the note to one greater than that id
-        let lastId = noteContents[noteContents.length - 1]["id"];
-        let newId = lastId + 1;
-        newNote["id"] = newId;
+        let lastID = noteData[noteData.length - 1]["id"];
+        let newID = lastID + 1;
+        newNotes["id"] = newID;
 
-        console.log("Req.body:", req.body);
-        noteContents.push(newNote);
 
-        // write to the noteContents.json file as well
-        writeFileAsync("./db/noteContents.json", JSON.stringify(noteContents)).then(function () {
-            console.log("noteContents.json has been updated!");
-        });
+        //req.body is available since we're using the body parsing middleware
+        console.log("Req.body: ", req.body);
+        noteData.push(newNotes);
 
-        res.json(newNote);
+
+        //
+        writeFileAsync("./db/db.json", JSON.stringify(noteData)).then(function () {
+            console.log("db.json has successfully been updated!");
+
+        })
+
+        res.json(newNotes);
     });
 
-    // Delete a post
+    //Delete
     app.delete("/api/notes/:id", function (req, res) {
-        // let chosen = req.params.id;        
-        // console.log(chosen);
 
-        console.log("Req.params:", req.params);
-        let chosenId = parseInt(req.params.id);
-        console.log(chosenId);
+        console.log("Req.params: ", req.params);
+        let userId = parseInt(req.params.id);
+
+        console.log(userId);
 
 
-        for (let i = 0; i < noteContents.length; i++) {
-            if (chosenId === noteContents[i].id) {
-                // delete noteContents[i];
-                noteContents.splice(i, 1);
+        for (let i = 0; i < noteData.length; i++) {
+            if (userId === noteData[i].id) {
 
-                let noteJSON = JSON.stringify(noteContents, null, 2);
+                noteData.splice(i, 1);
+                let dbJSON = JSON.stringify(noteData, null, 2);
 
-                writeFileAsync("./db/noteContents.json", noteJSON).then(function () {
-                    console.log("Chosen note has been deleted!");
+
+                writeFileAsync("./db/db.json", dbJSON).then(function () {
+                    console.log("Note has been deleted successfully!");
+
                 });
             }
         }
-        res.json(noteContents);
-        // data = data.filter(function(res) {
-        //     return noteContent.item.replace(/ /g, '-') !== req.params.id;
+
+        res.json(noteData);
+
     });
+
+
 
 };
