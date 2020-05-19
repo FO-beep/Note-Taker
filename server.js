@@ -1,5 +1,6 @@
 //Npm packages inorder to give our server useful functionality
 const express = require("express");
+const path = require("path");
 
 const app = express(); //This tells node that we are creating an express server
 const PORT = process.env.PORT || 8080; //Sets initial port
@@ -11,7 +12,9 @@ app.use(express.urlencoded({
 app.use(express.json());
 app.use(express.static("public"));
 
-
+app.get("/", function (req, res) {
+    res.sendFile(path.join(__dirname, "../public/index.html"));
+});
 
 //Router
 //The below points our server to a series of route files.
