@@ -12,14 +12,11 @@ app.use(express.urlencoded({
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "../public/index.html"));
-});
 
 //Router
 //The below points our server to a series of route files.
-require("./routes/apiRoutes")(app);
-require("./routes/htmlRoutes")(app);
+require("./routes/apiRoute")(app);
+require("./routes/htmlRoute")(app);
 
 //Listener - the code below effectively starts the server
 app.listen(PORT, function () {
