@@ -1,5 +1,6 @@
 //Load Data - here we link the routes to a series of "data" sources.
 //These data sources hold arrays of information
+var noteData = require("../db/noteData")
 const fs = require("fs");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
