@@ -1,71 +1,51 @@
-//Load Data - here we link the routes to a series of "data" sources.
-//These data sources hold arrays of information
+// LOAD DATA
+// We are linking our routes to a "data" source.
+
 const fs = require("fs");
-const util = require("util");
-const writeFileAsync = util.promisify(fs.writeFile);
+const dbJson = require("../develop/db/db");
 
-var noteData = require("../db/noteData")
-
-//Routing
+// ROUTING
 module.exports = function (app) {
+  // API GET Requests
+  // Below code handles when users "visit" a page.
+  // In each of the below cases when a user visits a link
+  // (ex: localhost:PORT/api/admin... they are shown a JSON of the data in the table)
 
-    //API GET requests
-    app.get("/api/notes", function (req, res) {
-        res.json(noteData);
-    });
+  app.get("/api/notes", (req, res) => {
+    res.json(dbJson);
+  });
 
+  // API POST Requests
+  // Below code handles when a user submits a form and thus submits data to the server.
 
-    //API POST requests
-    app.post("/api/notes", function (req, res) {
+  app.post("/api/notes", (req, res) => {
+    // Write user input to db.json
+    // req.body is available since we're using the body parsing middleware
+    // let data = req.body;
+    dbJson.push(req.body);
+    // console.log(req.body);
+    fs.writeFile(
+      "./develop/db/db.json",
+      JSON.stringify(dbJson),
+      (err, data) => {
+        if (err) throw err;
+        else res.json(data);
+      }
+    );
+  });
 
-        let newNotes = req.body;
+  // Delete
 
-        let lastID = noteData[noteData.length - 1]["id"];
-        let newID = lastID + 1;
-        newNotes["id"] = newID;
+  app.delete("/api/notes/:id", function (req, res) {
+    // Find the note with the id property & send 404 if note not found
+    const userDel = dbJson.find((n) => n.id == parseInt(req.params.id));
+    if (!userDel) return res.status(404).send("The note was not found.");
 
+    // Delete the note
+    const index = dbJson.indexOf(userDel);
+    dbJson.splice(index, 1);
 
-        //req.body is available since we're using the body parsing middleware
-        console.log("Req.body: ", req.body);
-        noteData.push(newNotes);
-
-
-        //
-        writeFileAsync("./db/db.json", JSON.stringify(noteData)).then(function () {
-            console.log("db.json has successfully been updated!");
-
-        })
-
-        res.json(newNotes);
-    });
-
-    //Delete
-    app.delete("/api/notes/:id", function (req, res) {
-
-        console.log("Req.params: ", req.params);
-        let userId = parseInt(req.params.id);
-
-        console.log(userId);
-
-
-        for (let i = 0; i < noteData.length; i++) {
-            if (userId === noteData[i].id) {
-
-                noteData.splice(i, 1);
-                let dbJSON = JSON.stringify(noteData, null, 2);
-
-
-                writeFileAsync("./db/db.json", dbJSON).then(function () {
-                    console.log("Note has been deleted successfully!");
-
-                });
-            }
-        }
-
-        res.json(noteData);
-
-    });
-
-
-
+    // Send response
+    res.send(userDel);
+  });
 };

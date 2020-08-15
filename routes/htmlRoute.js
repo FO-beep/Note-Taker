@@ -1,23 +1,21 @@
-//The path package needs to be included to get the correct file path for our html.
+// DEPENDENCIES
+// We need to include the path package to get the correct file path for our html
 
 const path = require("path");
 
-//Routing
+// ROUTING
 
-module.exports = function (app) {
+module.exports = (app) => {
+  // HTML GET Requests
+  // Below code handles when users "visit" a page.
+  // In each of the below cases the user is shown an HTML page of content
 
-    //If no matching route is found, default to index.
+  app.get("/notes", (req, res) => {
+    res.sendFile(path.join(__dirname, "../develop/public/notes.html"));
+  });
 
-
-    //HTML GET requests
-    //The code below handles when users visit a page. In each case below, the user is shown an HTML page of content
-    app.get("/notes", function (req, res) {
-        res.sendFile(path.join(__dirname, "../public/notes.html"));
-    });
-
-    //If no matching route is found, default to index.
-    app.get("*", function (req, res) {
-        res.sendFile(path.join(__dirname, "../public/index.html"));
-    });
-
+  // If no matching route is found default to home
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../develop/public/index.html"));
+  });
 };
